@@ -6,7 +6,6 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using aws_s3_file_validator.Models;
 using aws_s3_file_validator.Validators;
-using Newtonsoft.Json;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
