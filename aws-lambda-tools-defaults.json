@@ -5,12 +5,13 @@
     "dotnet lambda help",
     "All the command line options for the Lambda command can be specified in this file."
   ],
-  "profile": "",
+  "profile": "default",
   "region": "eu-west-1",
   "configuration": "Release",
   "function-architecture": "x86_64",
   "function-runtime": "dotnet8",
   "function-memory-size": 512,
   "function-timeout": 300,
+  "function-name": "s3-file-validator",
   "function-handler": "aws-s3-file-validator::aws_s3_file_validator.Function::Run"
 }
