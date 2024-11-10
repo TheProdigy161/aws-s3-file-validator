@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/aws-s3-file-validator/aws-s3-file-validator.csproj",
+                "${workspaceFolder}/aws-s3-file-validator/aws-s3-file-validator.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/src/aws-s3-file-validator/aws-s3-file-validator.csproj",
+                "${workspaceFolder}/aws-s3-file-validator/aws-s3-file-validator.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/src/aws-s3-file-validator/aws-s3-file-validator.csproj"
+                "${workspaceFolder}/aws-s3-file-validator/aws-s3-file-validator.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

@@ -11,7 +11,7 @@
             "preLaunchTask": "build",
             "program": "~/.dotnet/tools/dotnet-lambda-test-tool-8.0",
             "args": [],
-            "cwd": "${workspaceFolder}/src/aws-s3-file-validator",
+            "cwd": "${workspaceFolder}/aws-s3-file-validator",
             "console": "internalConsole",
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart" 
