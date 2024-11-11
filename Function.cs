@@ -83,6 +83,8 @@ public class Function
             sw.Stop();
             Console.WriteLine($"Execution Time: {sw.ElapsedMilliseconds}ms");
             Console.WriteLine($"Total Lines: {totalLineCount:n0}");
+            Console.WriteLine($"Valid Lines: {validLineCount:n0}");
+            Console.WriteLine($"Invalid Lines: {invalidLineCount:n0}");
         }
     }
 }
