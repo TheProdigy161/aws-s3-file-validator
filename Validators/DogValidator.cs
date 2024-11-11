@@ -1,4 +1,3 @@
-using System.Threading.Channels;
 using aws_s3_file_validator.Models;
 
 namespace aws_s3_file_validator.Validators;
@@ -10,8 +9,9 @@ public static class DogValidator
         bool dateOfBirthValid = model.IsDateOfBirthValid();
         bool dateOfDeathValid = model.IsDateOfDeathValid();
         bool ageValid = model.IsAgeValid();
+        bool deathFlagValid = model.IsDeathFlagValid();
 
-        return dateOfBirthValid && dateOfDeathValid && ageValid;
+        return dateOfBirthValid && dateOfDeathValid && ageValid && deathFlagValid;
     }
 
     private static bool IsDateOfBirthValid(this Dog model)
