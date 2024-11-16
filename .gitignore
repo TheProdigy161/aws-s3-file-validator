@@ -1,2 +1,9 @@
+# General
 bin
 obj
+
+# Terraform files
+*.tfstate
+*.tfstate.backup
+.terraform
+functions
