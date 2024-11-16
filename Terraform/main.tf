@@ -9,7 +9,7 @@ locals {
   function_name               = "s3-file-validator"
   function_handler            = "aws-s3-file-validator::aws_s3_file_validator.Function::Run"
   function_runtime            = "dotnet8"
-  function_timeout_in_seconds = 30
+  function_timeout_in_seconds = 120
 
   function_source_dir = "${path.module}/functions/${local.function_name}"
 }
