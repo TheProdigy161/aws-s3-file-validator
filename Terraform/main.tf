@@ -66,16 +66,32 @@ resource "aws_iam_role" "lambda_role" {
   assume_role_policy = data.aws_iam_policy_document.lambda_role_policy.json
 }
 
+## IAMs for Lambda User
+
 resource "aws_iam_policy" "iam_policy_for_lambda" {
   name        = "aws_iam_policy_for_lambda"
   path        = "/"
-  description = "A policy to allow lambda to access S3"
+  description = "Policy for lambda user"
   policy      = data.aws_iam_policy_document.lambda_iam_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.iam_policy_for_lambda.arn
+}
+
+## IAMs for Bucket
+
+resource "aws_iam_policy" "iam_policy_for_lambda_bucket" {
+  name        = "aws_iam_policy_for_lambda_bucket"
+  path        = "/"
+  description = "A policy to allow lambda to access S3 bucket"
+  policy      = data.aws_iam_policy_document.lambda-bucket-policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "attach_iam_bucket_policy_to_iam_role" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_bucket.arn
 }
 
 # Zip Project
