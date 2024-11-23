@@ -6,7 +6,7 @@ using aws_s3_file_validator.Utils;
 using DotNetEnv.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Logging;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -29,7 +29,6 @@ public class Function
         }
     }
 
-    [Performance]
     public async Task Run(S3Event s3Event)
     {
         try
@@ -70,12 +69,23 @@ public class Function
     {
         DotNetEnv.Env.Load();
         
+        IConfigurationRoot config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddDotNetEnv()
+            .Build();    
+
+        AppSettings appSettings = new AppSettings();
+        config.Bind(appSettings);
+        
         string validationModelJson = Environment.GetEnvironmentVariable("ValidationModel");
         
         ValidationModel validationModel = new ValidationModel(validationModelJson);
 
+        _services.AddSingleton(appSettings);
         _services.AddSingleton(validationModel);
+        _services.AddLogging(x => x.AddConsole());
         _services.AddTransient<AppService>();
+        _services.AddTransient<S3Service>();
         _services.AddTransient<ValidationService>();
 
         _serviceProvider = _services.BuildServiceProvider();

@@ -1,28 +1,33 @@
 using aws_s3_file_validator.Utils;
-using Amazon.S3;
-using Amazon.S3.Model;
 using aws_s3_file_validator.Models;
+using Microsoft.Extensions.Logging;
+using aws_s3_file_validator.Services;
+using System.Diagnostics;
 
 namespace aws_s3_file_validator;
 
 public class AppService
 {
+    private AppSettings _appSettings { get; set; }
     private ValidationModel _validationModel { get; set; }
+    private ILogger<AppService> _logger { get; set; }
+    private S3Service _s3Service { get; set; }
 
-    public AppService(ValidationModel validationModel)
+    public AppService(AppSettings appSettings, ILogger<AppService> logger, ValidationModel validationModel, S3Service s3Service)
     {
+        _appSettings = appSettings;
+        _logger = logger;
         _validationModel = validationModel;
+        _s3Service = s3Service;
     }
 
-    [Performance]
     public async Task Run(string bucketName, string keyName)
     {
-        AmazonS3Client client = new AmazonS3Client();
+        await _s3Service.DownloadFile(bucketName, keyName);
 
-        GetObjectResponse objectResponse = await client.GetObjectAsync(bucketName, keyName);
+        Stopwatch sw = Stopwatch.StartNew();
 
-        using (Stream responseStream = objectResponse.ResponseStream)
-        using (StreamReader reader = new StreamReader(responseStream))
+        using (StreamReader reader = new StreamReader($"{_appSettings.TempFolder}/{keyName}"))
         {   
             while (!reader.EndOfStream)
             {
@@ -46,9 +51,13 @@ public class AppService
 
                 if (StatsService.TotalLineCount % 50000 == 0)
                 {
-                    Console.WriteLine($"Processed {StatsService.TotalLineCount:n0} lines");
+                    _logger.LogInformation($"Processed {StatsService.TotalLineCount:n0} lines");
                 }
             }
         }
+
+        sw.Stop();
+        _logger.LogInformation($"Processed {StatsService.TotalLineCount:n0} lines in {sw.ElapsedMilliseconds} ms");
+        StatsService.Clear();
     }
 }
