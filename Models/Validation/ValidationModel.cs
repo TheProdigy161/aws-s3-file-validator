@@ -16,11 +16,11 @@ public class ValidationModel
     // Check if the values are valid.
     public bool IsValid(string rawValues)
     {
-        List<string> values = rawValues.Split(",").ToList();
+        string[] values = rawValues.Split(",");
 
-        foreach (var v in _validationVariables)
+        for (int i = 0; i < _validationVariables.Count; i++)
         {
-            if (!v.IsValid(values[v.ColumnIndex]))
+            if (!_validationVariables[i].IsValid(values[i]))
             {
                 return false;
             }

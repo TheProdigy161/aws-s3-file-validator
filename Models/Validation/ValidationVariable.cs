@@ -63,14 +63,14 @@ public class ValidationVariable
             return false;
         }
 
-        string valueType = value.Split(",")[ColumnIndex];
-
-        switch (_typeMap[valueType])
+        switch (_type)
         {
+            case Type v when v == typeof(string): // String
+                return true;
             case Type v when v == typeof(int): // Int
                 return int.TryParse(value, out _);
             case Type v when v == typeof(bool): // Bool
-                return float.TryParse(value, out _);
+                return bool.TryParse(value, out _);
             case Type v when v == typeof(DateTime): // DateTime
                 return DateTime.TryParse(value, out _);
             case Type v when v == typeof(DateOnly): // DateOnly
