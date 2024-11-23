@@ -23,4 +23,10 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
     <PackageReference Include="AWSSDK.Transfer" Version="3.7.401.23" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="./appsettings.json">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
