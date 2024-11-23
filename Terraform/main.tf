@@ -20,11 +20,16 @@ resource "aws_lambda_function" "s3_file_validator_lambda" {
   handler       = local.function_handler
   runtime       = local.function_runtime
   timeout       = local.function_timeout_in_seconds
+  memory_size   = 1024
 
   filename         = "${local.function_source_dir}.zip"
   source_code_hash = data.archive_file.function_zip.output_base64sha256
 
   role = aws_iam_role.lambda_role.arn
+
+  ephemeral_storage {
+    size = 10240 # Min 512 MB and the Max 10240 MB
+  }
 }
 
 # Bucket
