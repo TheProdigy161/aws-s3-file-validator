@@ -60,7 +60,6 @@ public class AppService
 
         sw.Stop();
         _logger.LogInformation($"Processed {StatsService.TotalLineCount:n0} lines in {sw.ElapsedMilliseconds} ms");
-        StatsService.Clear();
         ClearFile(filePath);
     }
 

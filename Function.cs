@@ -62,6 +62,7 @@ public class Function
         finally
         {
             StatsService.PrintStats();
+            StatsService.Clear();
         }
     }
 
