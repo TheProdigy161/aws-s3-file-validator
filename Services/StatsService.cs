@@ -18,5 +18,12 @@ namespace aws_s3_file_validator.Utils
             Console.WriteLine($"Valid Lines: {_validLineCount:n0}");
             Console.WriteLine($"Invalid Lines: {_invalidLineCount:n0}");
         }
+
+        public static void Clear()
+        {
+            _totalLineCount = 0;
+            _validLineCount = 0;
+            _invalidLineCount = 0;
+        }
     }
 }
