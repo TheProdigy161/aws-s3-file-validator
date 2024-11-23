@@ -1,5 +1,5 @@
 provider "aws" {
-  region                   = "eu-west-1"
+  region = "eu-west-1"
 }
 
 # Local Variables
@@ -8,7 +8,7 @@ locals {
   function_name               = "s3-file-validator"
   function_handler            = "aws-s3-file-validator::aws_s3_file_validator.Function::Run"
   function_runtime            = "dotnet8"
-  function_timeout_in_seconds = 120
+  function_timeout_in_seconds = 300
 
   function_source_dir = "${path.module}/functions/${local.function_name}"
 }
@@ -30,6 +30,14 @@ resource "aws_lambda_function" "s3_file_validator_lambda" {
   ephemeral_storage {
     size = 10240 # Min 512 MB and the Max 10240 MB
   }
+
+  environment {
+    variables = {
+      ValidationModel = jsonencode(var.ArrayOfValidationVariables)
+      AwsRegion       = "eu-west-1"
+      TempFolder      = "/tmp"
+    }
+  }
 }
 
 # Bucket
@@ -45,7 +53,7 @@ resource "aws_s3_bucket" "s3_file_validator_lambda_bucket" {
 # Bucket Trigger
 
 resource "aws_s3_bucket_notification" "s3_file_validator_lambda_trigger" {
-  bucket = "${aws_s3_bucket.s3_file_validator_lambda_bucket.id}"
+  bucket = aws_s3_bucket.s3_file_validator_lambda_bucket.id
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.s3_file_validator_lambda.arn
