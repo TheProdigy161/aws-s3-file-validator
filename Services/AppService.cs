@@ -27,7 +27,9 @@ public class AppService
 
         Stopwatch sw = Stopwatch.StartNew();
 
-        using (StreamReader reader = new StreamReader($"{_appSettings.TempFolder}/{keyName}"))
+        string filePath = $"{_appSettings.TempFolder}/{keyName}";
+
+        using (StreamReader reader = new StreamReader(filePath))
         {   
             while (!reader.EndOfStream)
             {
@@ -59,5 +61,11 @@ public class AppService
         sw.Stop();
         _logger.LogInformation($"Processed {StatsService.TotalLineCount:n0} lines in {sw.ElapsedMilliseconds} ms");
         StatsService.Clear();
+        ClearFile(filePath);
+    }
+
+    public void ClearFile(string filePath)
+    {
+        File.Delete(filePath);
     }
 }
