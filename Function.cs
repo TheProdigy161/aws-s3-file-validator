@@ -78,9 +78,9 @@ public class Function
         AppSettings appSettings = new AppSettings();
         config.Bind(appSettings);
         
-        string validationModelJson = Environment.GetEnvironmentVariable("ValidationModel");
+        string validationVariablesJson = Environment.GetEnvironmentVariable("ValidationVariables");
         
-        ValidationModel validationModel = new ValidationModel(validationModelJson);
+        ValidationModel validationModel = new ValidationModel(validationVariablesJson);
 
         _services.AddSingleton(appSettings);
         _services.AddSingleton(validationModel);

@@ -9,16 +9,16 @@ namespace aws_s3_file_validator;
 public class AppService
 {
     private AppSettings _appSettings { get; set; }
-    private ValidationModel _validationModel { get; set; }
+    private ValidationService _validationService { get; set; }
     private ILogger<AppService> _logger { get; set; }
     private S3Service _s3Service { get; set; }
 
-    public AppService(AppSettings appSettings, ILogger<AppService> logger, ValidationModel validationModel, S3Service s3Service)
+    public AppService(AppSettings appSettings, ILogger<AppService> logger, ValidationService validationService, S3Service s3Service)
     {
         _appSettings = appSettings;
         _logger = logger;
-        _validationModel = validationModel;
         _s3Service = s3Service;
+        _validationService = validationService;
     }
 
     public async Task Run(string bucketName, string keyName)
@@ -42,7 +42,7 @@ public class AppService
 
                 StatsService.IncrementTotalLineCount();
 
-                if (_validationModel.IsValid(content))
+                if (_validationService.IsValid(content))
                 {
                     StatsService.IncrementValidLineCount();
                 }

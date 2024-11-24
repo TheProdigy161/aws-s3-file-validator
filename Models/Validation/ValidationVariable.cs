@@ -1,15 +1,23 @@
+using System.Collections;
+using System.ComponentModel;
 using Newtonsoft.Json;
 
 namespace aws_s3_file_validator.Models;
 
 public class ValidationVariable
 {
+    public string Name { get; private set; }
     public int ColumnIndex { get; private set; }
 
     #region Validation variables
 
     private Type _type { get; set; }
     private bool _required { get; set; }
+
+    private TypeConverter _typeConverter { get; set; }
+
+    private object _minimum { get; set; }
+    private object _maximum { get; set; }
     
     #endregion
 
@@ -26,28 +34,26 @@ public class ValidationVariable
     };
 
     [JsonConstructor]
-    public ValidationVariable(int columnIndex, string type, bool required)
+    public ValidationVariable(string name, int columnIndex, string type, bool required, string minimum = null, string maximum = null)
     {
         try
         {
+            Name = name;
             ColumnIndex = columnIndex;
             _type = _typeMap[type];
             _required = required;
-        }
-        catch
-        {
-            throw new Exception("Invalid validation variable.");
-        }
-    }
 
-    // Build the validation variable from the JSON string.
-    public ValidationVariable(object value)
-    {
-        try
-        {
-            ColumnIndex = int.Parse(value.GetType().GetProperty("columnIndex").GetValue(value).ToString());
-            _type = Type.GetType(value.GetType().GetProperty("type").GetValue(value).ToString());
-            _required = bool.Parse(value.GetType().GetProperty("required").GetValue(value).ToString());
+            _typeConverter = TypeDescriptor.GetConverter(_type);
+
+            if (minimum != null)
+            {
+                _minimum = _typeConverter.ConvertFromInvariantString(minimum);
+            }
+
+            if (maximum != null)
+            {
+                _maximum = _typeConverter.ConvertFromInvariantString(maximum);
+            }
         }
         catch
         {
@@ -63,22 +69,35 @@ public class ValidationVariable
             return false;
         }
 
-        switch (_type)
+        if (IsTypeValid(value))
         {
-            case Type v when v == typeof(string): // String
-                return true;
-            case Type v when v == typeof(int): // Int
-                return int.TryParse(value, out _);
-            case Type v when v == typeof(bool): // Bool
-                return bool.TryParse(value, out _);
-            case Type v when v == typeof(DateTime): // DateTime
-                return DateTime.TryParse(value, out _);
-            case Type v when v == typeof(DateOnly): // DateOnly
-                return DateOnly.TryParse(value, out _);
-            case Type v when v == typeof(Guid): // Guid
-                return Guid.TryParse(value, out _);
-            default:
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool IsTypeValid(string value)
+    {
+        try
+        {
+            var convertedValue = _typeConverter.ConvertFromInvariantString(value);
+
+            if (_minimum != null && Comparer.Default.Compare(convertedValue, _minimum) < 0)
+            {
                 return false;
+            }
+
+            if (_maximum != null && Comparer.Default.Compare(convertedValue, _maximum) > 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 }
