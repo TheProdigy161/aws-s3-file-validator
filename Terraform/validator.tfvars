@@ -1,5 +1,5 @@
 var.ArrayOfValidationVariables = [
-{
+    {
         "name": "Id",
         "type": "Guid",
         "required": true,
@@ -15,19 +15,23 @@ var.ArrayOfValidationVariables = [
         "name": "DateOfBirth",
         "type": "DateOnly",
         "required": true,
-        "columnIndex": 2
+        "columnIndex": 2,
+        "minimum": "1900-01-01"
     },
     {
         "name": "DateOfDeath",
         "type": "DateOnly",
         "required": false,
-        "columnIndex": 3
+        "columnIndex": 3,
+        "minimum": "1900-01-01"
     },
     {
         "name": "Age",
         "type": "number",
         "required": true,
-        "columnIndex": 4
+        "columnIndex": 4,
+        "minimum": 0,
+        "maximum": 30
     },
     {
         "name": "IsDead",

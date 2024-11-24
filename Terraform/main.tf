@@ -33,9 +33,9 @@ resource "aws_lambda_function" "s3_file_validator_lambda" {
 
   environment {
     variables = {
-      ValidationModel = jsonencode(var.ArrayOfValidationVariables)
-      AwsRegion       = "eu-west-1"
-      TempFolder      = "/tmp"
+      ValidationVariables = jsonencode(var.ArrayOfValidationVariables)
+      AwsRegion           = "eu-west-1"
+      TempFolder          = "/tmp"
     }
   }
 }
