@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Amazon;
 using Amazon.S3;
 using Amazon.S3.Transfer;
@@ -29,6 +30,8 @@ public class S3Service
     {
         try
         {
+            Stopwatch sw = Stopwatch.StartNew();
+
             _logger.LogInformation($"Downloading file from S3 bucket: {bucketName} with key: {keyName}");
 
             await _fileTransferUtility.DownloadAsync
@@ -38,7 +41,8 @@ public class S3Service
                 keyName
             );
 
-            _logger.LogInformation($"File downloaded to: {_appSettings.TempFolder}/{keyName}");
+            sw.Stop();
+            _logger.LogInformation($"File downloaded to: {_appSettings.TempFolder}/{keyName} in {sw.ElapsedMilliseconds:n0} ms");
         }
         catch (Exception ex)
         {
