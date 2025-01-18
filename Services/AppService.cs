@@ -23,9 +23,9 @@ public class AppService
 
     public async Task Run(string bucketName, string keyName)
     {
-        await _s3Service.DownloadFile(bucketName, keyName);
-
         Performance.Start();
+
+        await _s3Service.DownloadFile(bucketName, keyName);
 
         string filePath = $"{_appSettings.TempFolder}/{keyName}";
 
@@ -51,7 +51,7 @@ public class AppService
                     StatsService.IncrementInvalidLineCount();
                 }
 
-                if (StatsService.TotalLineCount % 50000 == 0)
+                if (StatsService.TotalLineCount % 250_000 == 0)
                 {
                     _logger.LogInformation($"Processed {StatsService.TotalLineCount:n0} lines");
                 }
