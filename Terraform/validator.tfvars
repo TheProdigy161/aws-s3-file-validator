@@ -1,4 +1,4 @@
-var.ArrayOfValidationVariables = [
+ArrayOfValidationVariables = [
     {
         "name": "Id",
         "type": "Guid",
