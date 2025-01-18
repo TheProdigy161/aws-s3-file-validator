@@ -53,7 +53,14 @@ public class Function
                 return; 
             }
             
-            await appService.Run(bucketName, keyName);
+            if (Path.HasExtension(keyName))
+            {
+                await appService.Run(bucketName, keyName);
+            }
+            else
+            {
+                Console.WriteLine("Key does not have an extension");
+            }
         }
         catch (Exception ex)
         {
