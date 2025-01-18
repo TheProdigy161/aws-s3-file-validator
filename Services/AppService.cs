@@ -25,7 +25,7 @@ public class AppService
     {
         await _s3Service.DownloadFile(bucketName, keyName);
 
-        Stopwatch sw = Stopwatch.StartNew();
+        Performance.Start();
 
         string filePath = $"{_appSettings.TempFolder}/{keyName}";
 
@@ -58,8 +58,8 @@ public class AppService
             }
         }
 
-        sw.Stop();
-        _logger.LogInformation($"Processed {StatsService.TotalLineCount:n0} lines in {sw.ElapsedMilliseconds} ms");
+        Performance.Stop();
+        _logger.LogInformation($"Processed {StatsService.TotalLineCount:n0} lines in {Performance.GetTimeTaken()}");
         ClearFile(filePath);
     }
 
