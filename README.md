@@ -1,49 +1,74 @@
-# AWS Lambda Empty Function Project
+# AWS S3 File Validator
 
-This starter project consists of:
-* Function.cs - class file containing a class with a single function handler method
-* aws-lambda-tools-defaults.json - default argument settings for use with Visual Studio and command line deployment tools for AWS
+AWS Lambda function in .NET 8 that validates CSV files as soon as they are uploaded to S3. Each row is checked against a configurable schema, and the function reports how many rows passed or failed. Infrastructure is defined in Terraform.
 
-You may also have a test project depending on the options selected.
+## How It Works
 
-The generated function handler is a simple method accepting a string argument that returns the uppercase equivalent of the input string. Replace the body of this method, and parameters, to suit your needs. 
-
-## Here are some steps to follow from Visual Studio:
-
-To deploy your function to AWS Lambda, right click the project in Solution Explorer and select *Publish to AWS Lambda*.
-
-To view your deployed function open its Function View window by double-clicking the function name shown beneath the AWS Lambda node in the AWS Explorer tree.
-
-To perform testing against your deployed function use the Test Invoke tab in the opened Function View window.
-
-To configure event sources for your deployed function, for example to have your function invoked when an object is created in an Amazon S3 bucket, use the Event Sources tab in the opened Function View window.
-
-To update the runtime configuration of your deployed function use the Configuration tab in the opened Function View window.
-
-To view execution logs of invocations of your function use the Logs tab in the opened Function View window.
-
-## Here are some steps to follow to get started from the command line:
-
-Once you have edited your template and code you can deploy your application using the [Amazon.Lambda.Tools Global Tool](https://github.com/aws/aws-extensions-for-dotnet-cli#aws-lambda-amazonlambdatools) from the command line.
-
-Install Amazon.Lambda.Tools Global Tools if not already installed.
 ```
-    dotnet tool install -g Amazon.Lambda.Tools
+File uploaded to S3  →  s3:ObjectCreated event  →  Lambda
+                                                    ├─ downloads the file to ephemeral storage
+                                                    ├─ streams it line by line
+                                                    ├─ validates each column against the schema
+                                                    └─ logs total / valid / invalid counts and duration
 ```
 
-If already installed check if new version is available.
-```
-    dotnet tool update -g Amazon.Lambda.Tools
+- Files are streamed rather than loaded into memory, so large files are handled. Progress is logged every 250,000 lines.
+- The Lambda has 1 GB of memory, 10 GB of ephemeral storage and a 5-minute timeout.
+
+## Validation Schema
+
+The rules come from the `ValidationVariables` environment variable: a JSON array with one entry per CSV column.
+
+```json
+[
+  { "name": "Id",          "type": "Guid",     "required": true,  "columnIndex": 0 },
+  { "name": "Name",        "type": "string",   "required": true,  "columnIndex": 1 },
+  { "name": "DateOfBirth", "type": "DateOnly", "required": true,  "columnIndex": 2, "minimum": "1900-01-01" },
+  { "name": "Age",         "type": "number",   "required": true,  "columnIndex": 4, "minimum": 0, "maximum": 30 },
+  { "name": "IsDead",      "type": "boolean",  "required": true,  "columnIndex": 5 }
+]
 ```
 
-Execute unit tests
-```
-    cd "aws-s3-file-validator/test/aws-s3-file-validator.Tests"
-    dotnet test
+| Field | Description |
+|---|---|
+| `name` | Column name (used for reporting) |
+| `columnIndex` | Zero-based position in the comma-separated row |
+| `type` | `string`, `int`/`number`, `bool`/`boolean`, `DateTime`, `DateOnly` or `Guid` |
+| `required` | Whether an empty value fails validation |
+| `minimum` / `maximum` | Optional inclusive bounds, compared after type conversion |
+
+## Tech Stack
+
+| Area | Technology |
+|---|---|
+| Runtime | .NET 8 on AWS Lambda |
+| Trigger | S3 `ObjectCreated` events |
+| SDKs | AWSSDK.S3, Amazon.Lambda.S3Events |
+| Infrastructure | Terraform |
+
+## Deployment
+
+The Terraform in `Terraform/` creates the Lambda, an IAM role, the S3 bucket and the trigger.
+
+```bash
+make init     # terraform init
+make plan     # build in Release mode and run terraform plan
+make apply    # build in Release mode and apply
 ```
 
-Deploy function to AWS Lambda
+Set the schema in `Terraform/validator.tfvars` (`ArrayOfValidationVariables`). The default region is `eu-west-1`.
+
+## Local Development
+
+Settings are read from `appsettings.json` and a `.env` file (`ValidationVariables`, `AwsRegion`, `TempFolder`).
+
+Sample S3 events for the [AWS .NET Mock Lambda Test Tool](https://github.com/aws/aws-lambda-dotnet/tree/master/Tools/LambdaTestTool) are saved in `.lambda-test-tool/SavedRequests/`.
+
+## Project Structure
+
 ```
-    cd "aws-s3-file-validator/src/aws-s3-file-validator"
-    dotnet lambda deploy-function
+Function.cs   Lambda entry point and DI setup
+Services/     S3 download, validation, stats and orchestration
+Models/       Settings and validation schema
+Terraform/    Infrastructure as code
 ```
